@@ -1,20 +1,40 @@
-type TestDefinition<Arrange, Act> = {
+type TestDefinitionWithArrange<Arrange, Act> = {
   arrange: () => Arrange;
   act: (context: { arrange: Arrange }) => Act;
   assert: (context: { arrange: Arrange; act: Act }) => void;
 };
 
-export const stepTest = <Arrange, Act>(
-  testDefinition: TestDefinition<Arrange, Act>,
-) => {
-  return () => {
-    const arrange = testDefinition.arrange();
-    const act = testDefinition.act({ arrange });
-    testDefinition.assert({ arrange, act });
-  };
+type TestDefinitionWithoutArrange<Act> = {
+  act: () => Act;
+  assert: (context: { act: Act }) => void;
 };
+
+type TestDefinition<Arrange, Act> =
+  | TestDefinitionWithArrange<Arrange, Act>
+  | TestDefinitionWithoutArrange<Act>;
+
+export function stepTest<Arrange, Act>(
+  testDefinition: TestDefinitionWithArrange<Arrange, Act>,
+): () => void;
+export function stepTest<Act>(
+  testDefinition: TestDefinitionWithoutArrange<Act>,
+): () => void;
+export function stepTest<Arrange, Act>(
+  testDefinition: TestDefinition<Arrange, Act>,
+): () => void {
+  return () => {
+    if ("arrange" in testDefinition) {
+      const arrange = testDefinition.arrange();
+      const act = testDefinition.act({ arrange });
+      testDefinition.assert({ arrange, act });
+    } else {
+      const act = testDefinition.act();
+      testDefinition.assert({ act });
+    }
+  };
+}
 
 /**
  * TODO
- * - [ ] arrangeを省略可能に
+ * - [ ] 非同期対応
  */

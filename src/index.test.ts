@@ -21,7 +21,6 @@ describe("stepTest", () => {
   test(
     "arrange指定なし",
     stepTest({
-      arrange: () => {},
       act: () => 1 + 2,
       assert: ({ act }) => {
         expect(act).toBe(3);
