@@ -1,0 +1,26 @@
+{
+  "name": "@akfm/test-utils",
+  "version": "0.0.0",
+  "description": "Utility for test by @akfm.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts",
+    "test": "vitest",
+    "check": "biome check .",
+    "type-check": "tsc"
+  },
+  "keywords": ["jest", "vitest", "test", "utility"],
+  "author": "akfm",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "tsup": "8.4.0",
+    "typescript": "5.8.2",
+    "vitest": "3.0.8"
+  },
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  }
+}
