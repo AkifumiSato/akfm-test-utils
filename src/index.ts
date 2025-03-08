@@ -13,13 +13,13 @@ type TestDefinition<Arrange, Act> =
   | TestDefinitionWithArrange<Arrange, Act>
   | TestDefinitionWithoutArrange<Act>;
 
-export function stepTest<Arrange, Act>(
+export function step<Arrange, Act>(
   testDefinition: TestDefinitionWithArrange<Arrange, Act>,
 ): () => void;
-export function stepTest<Act>(
+export function step<Act>(
   testDefinition: TestDefinitionWithoutArrange<Act>,
 ): () => void;
-export function stepTest<Arrange, Act>(
+export function step<Arrange, Act>(
   testDefinition: TestDefinition<Arrange, Act>,
 ): () => void {
   return () => {

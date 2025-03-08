@@ -1,10 +1,10 @@
 import { describe, expect, test } from "vitest";
-import { stepTest } from "./index";
+import { step } from "./index";
 
 describe("stepTest", () => {
   test(
     "arrange指定あり",
-    stepTest({
+    step({
       arrange: () => ({
         a: 1,
         b: 2,
@@ -20,7 +20,7 @@ describe("stepTest", () => {
 
   test(
     "arrange指定なし",
-    stepTest({
+    step({
       act: () => 1 + 2,
       assert: ({ act }) => {
         expect(act).toBe(3);
@@ -30,7 +30,7 @@ describe("stepTest", () => {
 
   test(
     "複雑なオブジェクトでも動作する",
-    stepTest({
+    step({
       arrange: () => ({
         user: {
           name: "テストユーザー",
