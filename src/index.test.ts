@@ -10,11 +10,11 @@ describe("`step()`", () => {
           a: 1,
           b: 2,
         }),
-        act: ({ arrange }) => arrange.a + arrange.b,
-        assert: ({ arrange, act }) => {
-          expect(act).toBe(3);
-          expect(arrange.a).toBe(1);
-          expect(arrange.b).toBe(2);
+        act: ({ a, b }) => a + b,
+        assert: (result, { a, b }) => {
+          expect(result).toBe(3);
+          expect(a).toBe(1);
+          expect(b).toBe(2);
         },
       }),
     );
@@ -29,14 +29,13 @@ describe("`step()`", () => {
           },
           permissions: ["read", "write"],
         }),
-        act: ({ arrange }) => ({
-          displayName: `${arrange.user.name} (${arrange.user.age})`,
-          ...arrange,
+        act: ({ user, permissions }) => ({
+          displayName: `${user.name} (${user.age})`,
+          permissions,
         }),
-        assert: ({ arrange, act }) => {
-          expect(act.displayName).toBe("Test User (30)");
-          expect(act.user).toEqual(arrange.user);
-          expect(act.permissions).toEqual(arrange.permissions);
+        assert: (result, { permissions }) => {
+          expect(result.displayName).toBe("Test User (30)");
+          expect(result.permissions).toEqual(permissions);
         },
       }),
     );
@@ -51,14 +50,13 @@ describe("`step()`", () => {
           },
           permissions: ["read", "write"],
         }),
-        act: async ({ arrange }) => ({
-          displayName: `${arrange.user.name} (${arrange.user.age})`,
-          ...arrange,
+        act: async ({ user, permissions }) => ({
+          displayName: `${user.name} (${user.age})`,
+          permissions,
         }),
-        assert: async ({ arrange, act }) => {
-          expect(act.displayName).toBe("Test User (30)");
-          expect(act.user).toEqual(arrange.user);
-          expect(act.permissions).toEqual(arrange.permissions);
+        assert: async (result, { permissions }) => {
+          expect(result.displayName).toBe("Test User (30)");
+          expect(result.permissions).toEqual(permissions);
         },
       }),
     );
@@ -69,8 +67,8 @@ describe("`step()`", () => {
       "Ability to perform simple calculations.",
       step({
         act: () => 1 + 2,
-        assert: ({ act }) => {
-          expect(act).toBe(3);
+        assert: (result) => {
+          expect(result).toBe(3);
         },
       }),
     );
@@ -79,8 +77,8 @@ describe("`step()`", () => {
       "Supports asynchronous act.",
       step({
         act: async () => 1 + 2,
-        assert: async ({ act }) => {
-          expect(act).toBe(3);
+        assert: async (result) => {
+          expect(result).toBe(3);
         },
       }),
     );

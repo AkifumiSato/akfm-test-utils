@@ -1,38 +1,46 @@
-type DefinitionWithArrange<Arrange, Act> = {
-  arrange: () => Arrange | Promise<Arrange>;
-  act: (context: { arrange: Arrange }) => Act | Promise<Act>;
-  assert: (context: { arrange: Arrange; act: Act }) => void | Promise<void>;
+type DefinitionWithArrange<ArrangeResult, ActResult> = {
+  arrange: () => ArrangeResult | Promise<ArrangeResult>;
+  act: (arrange: ArrangeResult) => ActResult | Promise<ActResult>;
+  assert: (result: ActResult, arrange: ArrangeResult) => void | Promise<void>;
 };
 
-type DefinitionWithoutArrange<Act> = {
-  act: () => Act | Promise<Act>;
-  assert: (context: { act: Act }) => void | Promise<void>;
+type DefinitionWithoutArrange<ActResult> = {
+  act: () => ActResult | Promise<ActResult>;
+  assert: (result: ActResult) => void | Promise<void>;
 };
 
-export function step<Arrange, Act>(
-  definition: DefinitionWithArrange<Arrange, Act>,
+export function step<ArrangeResult, ActResult>(
+  definition: DefinitionWithArrange<ArrangeResult, ActResult>,
 ): () => void;
-export function step<Act>(
-  definition: DefinitionWithoutArrange<Act>,
+export function step<ActResult>(
+  definition: DefinitionWithoutArrange<ActResult>,
 ): () => void;
-export function step<Arrange, Act>(
+export function step<ArrangeResult, ActResult>(
   definition:
-    | DefinitionWithArrange<Arrange, Act>
-    | DefinitionWithoutArrange<Act>,
+    | DefinitionWithArrange<ArrangeResult, ActResult>
+    | DefinitionWithoutArrange<ActResult>,
 ): () => void {
   return async () => {
     // narrowing type
     if ("arrange" in definition) {
-      const arrangeResult = definition.arrange();
-      const arrange =
-        arrangeResult instanceof Promise ? await arrangeResult : arrangeResult;
-      const actResult = definition.act({ arrange });
-      const act = actResult instanceof Promise ? await actResult : actResult;
-      await definition.assert({ arrange, act });
+      const arrangeMaybePromise = definition.arrange();
+      const arrangeResult =
+        arrangeMaybePromise instanceof Promise
+          ? await arrangeMaybePromise
+          : arrangeMaybePromise;
+      const actMaybePromise = definition.act(arrangeResult);
+      const actResult =
+        actMaybePromise instanceof Promise
+          ? await actMaybePromise
+          : actMaybePromise;
+      await definition.assert(actResult, arrangeResult);
     } else {
-      const actResult = definition.act();
-      const act = actResult instanceof Promise ? await actResult : actResult;
-      await definition.assert({ act });
+      const actMaybePromise = definition.act();
+      const actResult =
+        actMaybePromise instanceof Promise
+          ? await actMaybePromise
+          : actMaybePromise;
+      await definition.assert(actResult);
     }
   };
 }

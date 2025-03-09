@@ -1,5 +1,4 @@
 # Todo
 
-- [ ] act/assertの引数を見直し
-- [ ] npm publish
+- [ ] Changesetsの導入、npm publish
 - [ ] Arrangeの共通化を促す（ArrangeFactory?）

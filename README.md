@@ -19,31 +19,34 @@ yarn add @akfm/test-utils
 
 ## API
 
-### `step<Arrange, Act>(definition: Definition<Arrange, Act>): () => void`
+### `step(definition)`
 
 The `step()` function structures your tests following the Arrange-Act-Assert (AAA) pattern, improving readability and maintainability.
 
 #### Type Definition
 
 ```ts
-type Definition<Arrange, Act> =
+type Definition<ArrangeResult, ActResult> =
   | {
-      arrange: () => Arrange | Promise<Arrange>;
-      act: (context: { arrange: Arrange }) => Act | Promise<Act>;
-      assert: (context: { arrange: Arrange; act: Act }) => void | Promise<void>;
+      arrange: () => ArrangeResult | Promise<ArrangeResult>;
+      act: (arrange: ArrangeResult) => ActResult | Promise<ActResult>;
+      assert: (
+        result: ActResult,
+        arrange: ArrangeResult,
+      ) => void | Promise<void>;
     }
   | {
-      act: () => Act | Promise<Act>;
-      assert: (context: { act: Act }) => void | Promise<void>;
+      act: () => ActResult | Promise<ActResult>;
+      assert: (result: ActResult) => void | Promise<void>;
     };
 ```
 
 #### Arguments
 
-- `definition: Definition<Arrange, Act>`: The test definition object.
-  - `arrange?: () => Arrange | Promise<Arrange>`: A function that performs test preparation (optional).
-  - `act: (context: { arrange: Arrange } | undefined) => Act | Promise<Act>`: A function that performs test execution.
-  - `assert: (context: { arrange?: Arrange; act: Act }) => void | Promise<void>`: A function that verifies the test result.
+- `definition: Definition<ArrangeResult, ActResult>`: The test definition object.
+  - `arrange?: () => ArrangeResult | Promise<ArrangeResult>`: A function that performs test preparation (optional).
+  - `act: (arrange?: ArrangeResult) => ActResult | Promise<ActResult>`: A function that performs test execution.
+  - `assert: (result: ActResult, arrange?: ArrangeResult) => void | Promise<void>`: A function that verifies the test result.
 
 #### Returns
 
@@ -68,11 +71,10 @@ test(
       },
       permissions: ["read", "write"],
     }),
-    act: ({ arrange: { user, permissions } }) =>
-      formatterUser(user, permissions),
-    assert: ({ arrange, act }) => {
-      expect(act.displayName).toBe("Test User (30)");
-      expect(act.permissions).toEqual(arrange.permissions);
+    act: ({ user, permissions }) => formatterUser(user, permissions),
+    assert: (result, { permissions }) => {
+      expect(result.displayName).toBe("Test User (30)");
+      expect(result.permissions).toEqual(permissions);
     },
   }),
 );
