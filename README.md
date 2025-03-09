@@ -1,5 +1,8 @@
 # @akfm/test-utils
 
+[![npm version](https://badge.fury.io/js/@akfm%2Ftest-utils.svg)](https://badge.fury.io/js/@akfm%2Ftest-utils)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Utility for test with 0 dependencies. This is a very lightweight and simple utility for writing tests.
 
 ## Features
