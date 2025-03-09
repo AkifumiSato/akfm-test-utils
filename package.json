@@ -10,7 +10,12 @@
     "check": "biome check .",
     "type-check": "tsc"
   },
-  "keywords": ["jest", "vitest", "test", "utility"],
+  "keywords": [
+    "jest",
+    "vitest",
+    "test",
+    "utility"
+  ],
   "author": "akfm",
   "license": "MIT",
   "devDependencies": {
@@ -19,7 +24,9 @@
     "typescript": "5.8.2",
     "vitest": "3.0.8"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   }
