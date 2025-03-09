@@ -79,3 +79,11 @@ test(
   }),
 );
 ```
+
+#### Note: AAA
+
+The AAA (Arrange-Act-Assert) pattern is a common way to structure unit tests. It involves dividing a test into three distinct sections:
+
+- Arrange: Set up the necessary preconditions for the test.
+- Act: Execute the code being tested.
+- Assert: Verify that the code behaves as expected.
