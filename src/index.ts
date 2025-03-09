@@ -36,8 +36,3 @@ export function step<Arrange, Act>(
     }
   };
 }
-
-/**
- * TODO
- * - [ ] Arrangeの共通化を促す（ArrangeFactory?）
- */
