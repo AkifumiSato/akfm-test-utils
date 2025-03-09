@@ -1,6 +1,6 @@
 # @akfm/test-utils
 
-Utility for test.
+Utility for test with 0 dependencies. This is a very lightweight and simple utility for writing tests.
 
 ## Features
 
