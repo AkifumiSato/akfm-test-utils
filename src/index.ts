@@ -58,7 +58,7 @@ type DefinitionWithoutArrange<ActResult> = {
  */
 export function step<ArrangeResult, ActResult>(
   definition: DefinitionWithArrange<ArrangeResult, ActResult>,
-): () => void;
+): () => Promise<void>;
 /**
  * Structures your tests following the Act-Assert pattern.
  *
@@ -68,7 +68,7 @@ export function step<ArrangeResult, ActResult>(
  */
 export function step<ActResult>(
   definition: DefinitionWithoutArrange<ActResult>,
-): () => void;
+): () => Promise<void>;
 /**
  * Structures your tests following the Arrange-Act-Assert (AAA) pattern, improving readability and maintainability.
  *
@@ -85,7 +85,7 @@ export function step<ArrangeResult, ActResult>(
   definition:
     | DefinitionWithArrange<ArrangeResult, ActResult>
     | DefinitionWithoutArrange<ActResult>,
-): () => void {
+): () => Promise<void> {
   return async () => {
     // narrowing type
     if ("arrange" in definition) {
