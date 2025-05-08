@@ -1,6 +1,6 @@
 {
   "name": "@akfm/test-utils",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": "https://github.com/AkifumiSato/akfm-test-utils",
   "description": "Utility for test by @akfm.",
   "files": ["dist", "package.json"],
