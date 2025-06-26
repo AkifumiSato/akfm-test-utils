@@ -2,14 +2,11 @@ import { describe, expect, test } from "vitest";
 import { step } from ".";
 
 describe("`step()`", () => {
-  describe("with arrange specified", () => {
+  describe("with `arrange`", () => {
     test(
-      "Ability to perform simple calculations.",
+      "simple calculations",
       step({
-        arrange: () => ({
-          a: 1,
-          b: 2,
-        }),
+        arrange: () => ({ a: 1, b: 2 }),
         act: ({ a, b }) => a + b,
         assert: (result, { a, b }) => {
           expect(result).toBe(3);
@@ -20,13 +17,10 @@ describe("`step()`", () => {
     );
 
     test(
-      "Ability to pass complex objects around.",
+      "complex objects",
       step({
         arrange: () => ({
-          user: {
-            name: "Test User",
-            age: 30,
-          },
+          user: { name: "Test User", age: 30 },
           permissions: ["read", "write"],
         }),
         act: ({ user, permissions }) => ({
@@ -41,13 +35,10 @@ describe("`step()`", () => {
     );
 
     test(
-      "Supports asynchronous arrange, act, assert.",
+      "async operations",
       step({
         arrange: async () => ({
-          user: {
-            name: "Test User",
-            age: 30,
-          },
+          user: { name: "Test User", age: 30 },
           permissions: ["read", "write"],
         }),
         act: async ({ user, permissions }) => ({
@@ -62,9 +53,9 @@ describe("`step()`", () => {
     );
   });
 
-  describe("arrange omitted", () => {
+  describe("without `arrange`", () => {
     test(
-      "Ability to perform simple calculations.",
+      "simple calculations",
       step({
         act: () => 1 + 2,
         assert: (result) => {
@@ -74,7 +65,7 @@ describe("`step()`", () => {
     );
 
     test(
-      "Supports asynchronous act.",
+      "async operations",
       step({
         act: async () => 1 + 2,
         assert: async (result) => {
@@ -82,5 +73,44 @@ describe("`step()`", () => {
         },
       }),
     );
+  });
+
+  describe("`test.each` support", () => {
+    describe("with `arrange`", () => {
+      test.each([
+        { a: 1, b: 2, expected: 3 },
+        { a: 2, b: 3, expected: 5 },
+      ])(
+        "adds $a + $b = $expected",
+        step({
+          arrange: (testData) => ({ ...testData, multiplier: 1 }),
+          act: ({ a, b, multiplier, expected }) => ({
+            result: (a + b) * multiplier,
+            expected,
+          }),
+          assert: ({ result, expected }) => {
+            expect(result).toBe(expected);
+          },
+        }),
+      );
+    });
+
+    describe("without `arrange`", () => {
+      test.each([
+        { a: 1, b: 2, expected: 3 },
+        { a: 3, b: 4, expected: 7 },
+      ])(
+        "adds $a + $b = $expected",
+        step({
+          act: ({ a, b, expected }) => ({
+            result: a + b,
+            expected,
+          }),
+          assert: ({ result, expected }) => {
+            expect(result).toBe(expected);
+          },
+        }),
+      );
+    });
   });
 });
