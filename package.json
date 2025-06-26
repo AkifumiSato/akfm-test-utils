@@ -15,7 +15,7 @@
     "build": "tsup src/index.ts",
     "test": "vitest",
     "check": "biome check .",
-    "type-check": "tsc"
+    "typecheck": "tsc"
   },
   "keywords": ["jest", "vitest", "test", "utility"],
   "author": "akfm",
