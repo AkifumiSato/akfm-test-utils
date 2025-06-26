@@ -29,9 +29,10 @@ The `step()` function structures your tests following the Arrange-Act-Assert (AA
 #### Type Definition
 
 ```ts
-type Definition<ArrangeResult, ActResult> =
+type Definition<ArrangeResult, ActResult, TestData> =
   | {
-      arrange: () => ArrangeResult | Promise<ArrangeResult>;
+      // `testData` is only available when `step` is used with `test.each`
+      arrange: (testData?: TestData) => ArrangeResult | Promise<ArrangeResult>;
       act: (arrange: ArrangeResult) => ActResult | Promise<ActResult>;
       assert: (
         result: ActResult,
@@ -39,16 +40,16 @@ type Definition<ArrangeResult, ActResult> =
       ) => void | Promise<void>;
     }
   | {
-      act: () => ActResult | Promise<ActResult>;
+      act: (testData: TestData) => ActResult | Promise<ActResult>;
       assert: (result: ActResult) => void | Promise<void>;
     };
 ```
 
 #### Arguments
 
-- `definition: Definition<ArrangeResult, ActResult>`: The test definition object.
-  - `arrange?: () => ArrangeResult | Promise<ArrangeResult>`: A function that performs test preparation (optional).
-  - `act: (arrange?: ArrangeResult) => ActResult | Promise<ActResult>`: A function that performs test execution.
+- `definition: Definition<ArrangeResult, ActResult, TestData>`: The test definition object.
+  - `arrange?: (testData: TestData) => ArrangeResult | Promise<ArrangeResult>`: A function that performs test preparation (optional).
+  - `act: (arrange?: ArrangeResult | testData: TestData) => ActResult | Promise<ActResult>`: A function that performs test execution.
   - `assert: (result: ActResult, arrange?: ArrangeResult) => void | Promise<void>`: A function that verifies the test result.
 
 #### Returns
@@ -79,6 +80,20 @@ test(
       expect(result.displayName).toBe("Test User (30)");
       expect(result.permissions).toEqual(permissions);
     },
+  }),
+);
+
+// With `test.each`
+test.each([
+  { a: 1, b: 2, expected: 3 },
+  { a: 2, b: 3, expected: 5 },
+])(
+  "adds $a + $b = $expected",
+  step({
+    // `testData` is `{ a: number; b: number; expected: number }`
+    arrange: (testData) => ({ ...testData, multiplier: 1 }),
+    act: ({ a, b, multiplier }) => a + b * multiplier,
+    assert: (result, { expected }) => expect(result).toBe(expected),
   }),
 );
 ```

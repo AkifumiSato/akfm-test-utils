@@ -1,12 +1,13 @@
-type DefinitionWithArrange<ArrangeResult, ActResult> = {
+type DefinitionWithArrange<ArrangeResult, ActResult, TestData> = {
   /**
    * Sets up the necessary preconditions for the test. This function can return either the result directly or a Promise that resolves to the result.
    *
    * **Arrange**
    *
+   * @param testData The test data provided from `test.each` or similar test utilities.
    * @returns The result of the arrange phase or a Promise of the result.
    */
-  arrange: () => ArrangeResult | Promise<ArrangeResult>;
+  arrange: (testData: TestData) => ArrangeResult | Promise<ArrangeResult>;
   /**
    * Performs the action being tested, utilizing the result from the arrange phase. This function can return either the result of the action directly or a Promise that resolves to the result.
    *
@@ -28,15 +29,16 @@ type DefinitionWithArrange<ArrangeResult, ActResult> = {
   assert: (result: ActResult, arrange: ArrangeResult) => void | Promise<void>;
 };
 
-type DefinitionWithoutArrange<ActResult> = {
+type DefinitionWithoutArrange<ActResult, TestData = undefined> = {
   /**
    * Performs the action being tested. This function can return either the result of the action directly or a Promise that resolves to the result.
    *
    * **Act**
    *
+   * @param testData The test data provided from `test.each` or similar test utilities.
    * @returns The result of the act phase or a Promise of the result.
    */
-  act: () => ActResult | Promise<ActResult>;
+  act: (testData: TestData) => ActResult | Promise<ActResult>;
   /**
    * Verifies the outcome of the action. This function can optionally return a Promise that resolves when the assertion is complete.
    *
@@ -53,22 +55,24 @@ type DefinitionWithoutArrange<ActResult> = {
  *
  * @template ArrangeResult The type of the result from the arrange phase.
  * @template ActResult The type of the result from the act phase.
+ * @template TestData The type of the test data provided from `test.each` or similar test utilities.
  * @param definition The test definition object with `arrange`, `act`, and `assert` functions.
  * @returns The test function.
  */
-export function step<ArrangeResult, ActResult>(
-  definition: DefinitionWithArrange<ArrangeResult, ActResult>,
-): () => Promise<void>;
+export function step<ArrangeResult, ActResult, TestData = never>(
+  definition: DefinitionWithArrange<ArrangeResult, ActResult, TestData>,
+): (testData: TestData) => Promise<void>;
 /**
  * Structures your tests following the Act-Assert pattern.
  *
  * @template ActResult The type of the result from the act phase.
+ * @template TestData The type of the test data provided from `test.each` or similar test utilities.
  * @param definition The test definition object with `act` and `assert` functions.
  * @returns The test function.
  */
-export function step<ActResult>(
-  definition: DefinitionWithoutArrange<ActResult>,
-): () => Promise<void>;
+export function step<ActResult, TestData = never>(
+  definition: DefinitionWithoutArrange<ActResult, TestData>,
+): (testData: TestData) => Promise<void>;
 /**
  * Structures your tests following the Arrange-Act-Assert (AAA) pattern, improving readability and maintainability.
  *
@@ -76,37 +80,25 @@ export function step<ActResult>(
  * an `act` function for performing the action under test, and an `assert` function for verifying the result,
  * or just an `act` and `assert` function for simpler test cases.
  *
+ * Supports `test.each` and similar test utilities by accepting test data as a parameter.
+ *
  * @template ArrangeResult The type of the result from the arrange phase (if applicable).
  * @template ActResult The type of the result from the act phase.
+ * @template TestData The type of the test data provided from `test.each` or similar test utilities.
  * @param definition The test definition object.
  * @returns A function that encapsulates the test logic, ready to be executed by a test runner.
  */
-export function step<ArrangeResult, ActResult>(
+export function step<ArrangeResult, ActResult, TestData = never>(
   definition:
-    | DefinitionWithArrange<ArrangeResult, ActResult>
-    | DefinitionWithoutArrange<ActResult>,
+    | DefinitionWithArrange<ArrangeResult, ActResult, TestData>
+    | DefinitionWithoutArrange<ActResult, TestData>,
 ): () => Promise<void> {
-  return async () => {
-    // narrowing type
-    if ("arrange" in definition) {
-      const arrangeMaybePromise = definition.arrange();
-      const arrangeResult =
-        arrangeMaybePromise instanceof Promise
-          ? await arrangeMaybePromise
-          : arrangeMaybePromise;
-      const actMaybePromise = definition.act(arrangeResult);
-      const actResult =
-        actMaybePromise instanceof Promise
-          ? await actMaybePromise
-          : actMaybePromise;
-      await definition.assert(actResult, arrangeResult);
-    } else {
-      const actMaybePromise = definition.act();
-      const actResult =
-        actMaybePromise instanceof Promise
-          ? await actMaybePromise
-          : actMaybePromise;
-      await definition.assert(actResult);
-    }
+  return async (testData?: TestData) => {
+    const actArg =
+      "arrange" in definition
+        ? await definition.arrange(testData as TestData)
+        : testData;
+    const actResult = await definition.act(actArg as ArrangeResult & TestData);
+    await definition.assert(actResult, actArg as ArrangeResult);
   };
 }
