@@ -96,8 +96,10 @@ export function step<ArrangeResult, ActResult, TestData = never>(
   return async (testData?: TestData) => {
     const actArg =
       "arrange" in definition
-        ? await definition.arrange(testData as TestData)
+        ? // Even though `definition.arrange()` might not return a Promise, we await it uniformly
+          await definition.arrange(testData as TestData)
         : testData;
+    // Even though `definition.act()` might not return a Promise, we await it uniformly
     const actResult = await definition.act(actArg as ArrangeResult & TestData);
     await definition.assert(actResult, actArg as ArrangeResult);
   };
