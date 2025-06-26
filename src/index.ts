@@ -29,7 +29,7 @@ type DefinitionWithArrange<ArrangeResult, ActResult, TestData> = {
   assert: (result: ActResult, arrange: ArrangeResult) => void | Promise<void>;
 };
 
-type DefinitionWithoutArrange<ActResult, TestData = undefined> = {
+type DefinitionWithoutArrange<ActResult, TestData> = {
   /**
    * Performs the action being tested. This function can return either the result of the action directly or a Promise that resolves to the result.
    *

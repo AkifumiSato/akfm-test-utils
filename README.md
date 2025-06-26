@@ -31,8 +31,8 @@ The `step()` function structures your tests following the Arrange-Act-Assert (AA
 ```ts
 type Definition<ArrangeResult, ActResult, TestData> =
   | {
-      // `testData` is only available when `step` is used with `test.each`
-      arrange: (testData?: TestData) => ArrangeResult | Promise<ArrangeResult>;
+      // `testData` is only provided when `step` is used with `test.each`
+      arrange: (testData: TestData) => ArrangeResult | Promise<ArrangeResult>;
       act: (arrange: ArrangeResult) => ActResult | Promise<ActResult>;
       assert: (
         result: ActResult,
@@ -40,6 +40,7 @@ type Definition<ArrangeResult, ActResult, TestData> =
       ) => void | Promise<void>;
     }
   | {
+      // `testData` is only provided when `step` is used with `test.each`
       act: (testData: TestData) => ActResult | Promise<ActResult>;
       assert: (result: ActResult) => void | Promise<void>;
     };
@@ -48,8 +49,8 @@ type Definition<ArrangeResult, ActResult, TestData> =
 #### Arguments
 
 - `definition: Definition<ArrangeResult, ActResult, TestData>`: The test definition object.
-  - `arrange?: (testData: TestData) => ArrangeResult | Promise<ArrangeResult>`: A function that performs test preparation (optional).
-  - `act: (arrange?: ArrangeResult | testData: TestData) => ActResult | Promise<ActResult>`: A function that performs test execution.
+  - `arrange?: (testData: TestData) => ArrangeResult | Promise<ArrangeResult>`: A function that performs test preparation (optional). `testData` is only provided when `step` is used with `test.each`.
+  - `act: (arrange?: ArrangeResult | testData: TestData) => ActResult | Promise<ActResult>`: A function that performs test execution. `testData` is only provided when `step` is used with `test.each` and `arrange` is not provided.
   - `assert: (result: ActResult, arrange?: ArrangeResult) => void | Promise<void>`: A function that verifies the test result.
 
 #### Returns
