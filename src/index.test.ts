@@ -93,6 +93,26 @@ describe("`step()`", () => {
           },
         }),
       );
+
+      test.each([
+        [1, 2, 3],
+        [2, 3, 5],
+      ])(
+        "adds $a + $b = $expected",
+        step({
+          arrange: (a, b, expected) => ({
+            a,
+            b,
+            expected,
+          }),
+          act: ({ a, b }) => ({
+            result: a + b,
+          }),
+          assert: ({ result }, { expected }) => {
+            expect(result).toBe(expected);
+          },
+        }),
+      );
     });
 
     describe("without `arrange`", () => {
@@ -103,6 +123,22 @@ describe("`step()`", () => {
         "adds $a + $b = $expected",
         step({
           act: ({ a, b, expected }) => ({
+            result: a + b,
+            expected,
+          }),
+          assert: ({ result, expected }) => {
+            expect(result).toBe(expected);
+          },
+        }),
+      );
+
+      test.each([
+        [1, 2, 3],
+        [2, 3, 5],
+      ])(
+        "adds $a + $b = $expected",
+        step({
+          act: (a, b, expected) => ({
             result: a + b,
             expected,
           }),

@@ -1,4 +1,8 @@
-type DefinitionWithArrange<ArrangeResult, ActResult, TestData> = {
+type DefinitionWithArrange<
+  ArrangeResult,
+  ActResult,
+  TestData extends readonly unknown[],
+> = {
   /**
    * Sets up the necessary preconditions for the test. This function can return either the result directly or a Promise that resolves to the result.
    *
@@ -7,7 +11,7 @@ type DefinitionWithArrange<ArrangeResult, ActResult, TestData> = {
    * @param testData The test data provided from `test.each` or similar test utilities.
    * @returns The result of the arrange phase or a Promise of the result.
    */
-  arrange: (testData: TestData) => ArrangeResult | Promise<ArrangeResult>;
+  arrange: (...testData: TestData) => ArrangeResult | Promise<ArrangeResult>;
   /**
    * Performs the action being tested, utilizing the result from the arrange phase. This function can return either the result of the action directly or a Promise that resolves to the result.
    *
@@ -29,7 +33,10 @@ type DefinitionWithArrange<ArrangeResult, ActResult, TestData> = {
   assert: (result: ActResult, arrange: ArrangeResult) => void | Promise<void>;
 };
 
-type DefinitionWithoutArrange<ActResult, TestData> = {
+type DefinitionWithoutArrange<
+  ActResult,
+  TestData extends readonly unknown[],
+> = {
   /**
    * Performs the action being tested. This function can return either the result of the action directly or a Promise that resolves to the result.
    *
@@ -38,7 +45,7 @@ type DefinitionWithoutArrange<ActResult, TestData> = {
    * @param testData The test data provided from `test.each` or similar test utilities.
    * @returns The result of the act phase or a Promise of the result.
    */
-  act: (testData: TestData) => ActResult | Promise<ActResult>;
+  act: (...testData: TestData) => ActResult | Promise<ActResult>;
   /**
    * Verifies the outcome of the action. This function can optionally return a Promise that resolves when the assertion is complete.
    *
@@ -59,9 +66,13 @@ type DefinitionWithoutArrange<ActResult, TestData> = {
  * @param definition The test definition object with `arrange`, `act`, and `assert` functions.
  * @returns The test function.
  */
-export function step<ArrangeResult, ActResult, TestData = never>(
+export function step<
+  ArrangeResult,
+  ActResult,
+  TestData extends readonly unknown[] = [],
+>(
   definition: DefinitionWithArrange<ArrangeResult, ActResult, TestData>,
-): (testData: TestData) => Promise<void>;
+): (...testData: TestData) => Promise<void>;
 /**
  * Structures your tests following the Act-Assert pattern.
  *
@@ -70,9 +81,9 @@ export function step<ArrangeResult, ActResult, TestData = never>(
  * @param definition The test definition object with `act` and `assert` functions.
  * @returns The test function.
  */
-export function step<ActResult, TestData = never>(
+export function step<ActResult, TestData extends readonly unknown[] = []>(
   definition: DefinitionWithoutArrange<ActResult, TestData>,
-): (testData: TestData) => Promise<void>;
+): (...testData: TestData) => Promise<void>;
 /**
  * Structures your tests following the Arrange-Act-Assert (AAA) pattern, improving readability and maintainability.
  *
@@ -88,19 +99,23 @@ export function step<ActResult, TestData = never>(
  * @param definition The test definition object.
  * @returns A function that encapsulates the test logic, ready to be executed by a test runner.
  */
-export function step<ArrangeResult, ActResult, TestData = never>(
+export function step<
+  ArrangeResult,
+  ActResult,
+  TestData extends readonly unknown[] = [],
+>(
   definition:
     | DefinitionWithArrange<ArrangeResult, ActResult, TestData>
     | DefinitionWithoutArrange<ActResult, TestData>,
-): () => Promise<void> {
-  return async (testData?: TestData) => {
-    const actArg =
-      "arrange" in definition
-        ? // Even though `definition.arrange()` might not return a Promise, we await it uniformly
-          await definition.arrange(testData as TestData)
-        : testData;
-    // Even though `definition.act()` might not return a Promise, we await it uniformly
-    const actResult = await definition.act(actArg as ArrangeResult & TestData);
-    await definition.assert(actResult, actArg as ArrangeResult);
+): (...testData: TestData) => Promise<void> {
+  return async (...testData: TestData) => {
+    if ("arrange" in definition) {
+      const arrangeResult = await definition.arrange(...testData);
+      const actResult = await definition.act(arrangeResult);
+      await definition.assert(actResult, arrangeResult);
+    } else {
+      const actResult = await definition.act(...testData);
+      await definition.assert(actResult);
+    }
   };
 }
