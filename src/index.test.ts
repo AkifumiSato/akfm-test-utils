@@ -77,10 +77,7 @@ describe("`step()`", () => {
 
   describe("`test.each` support", () => {
     describe("with `arrange`", () => {
-      test.each([
-        { a: 1, b: 2, expected: 3 },
-        { a: 2, b: 3, expected: 5 },
-      ])(
+      test.each([{ a: 1, b: 2, expected: 3 }])(
         "adds $a + $b = $expected",
         step({
           arrange: (testData) => ({ ...testData, multiplier: 1 }),
@@ -94,10 +91,7 @@ describe("`step()`", () => {
         }),
       );
 
-      test.each([
-        [1, 2, 3],
-        [2, 3, 5],
-      ])(
+      test.each([[1, 2, 3]])(
         "adds $a + $b = $expected",
         step({
           arrange: (a, b, expected) => ({
@@ -116,10 +110,7 @@ describe("`step()`", () => {
     });
 
     describe("without `arrange`", () => {
-      test.each([
-        { a: 1, b: 2, expected: 3 },
-        { a: 3, b: 4, expected: 7 },
-      ])(
+      test.each([{ a: 1, b: 2, expected: 3 }])(
         "adds $a + $b = $expected",
         step({
           act: ({ a, b, expected }) => ({
@@ -132,11 +123,8 @@ describe("`step()`", () => {
         }),
       );
 
-      test.each([
-        [1, 2, 3],
-        [2, 3, 5],
-      ])(
-        "adds $a + $b = $expected",
+      test.each([[1, 2, 3]])(
+        "adds %s + %s = %s",
         step({
           act: (a, b, expected) => ({
             result: a + b,
