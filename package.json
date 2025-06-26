@@ -1,9 +1,12 @@
 {
   "name": "@akfm/test-utils",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "repository": "https://github.com/AkifumiSato/akfm-test-utils",
   "description": "Utility for test by @akfm.",
-  "files": ["dist", "package.json"],
+  "files": [
+    "dist",
+    "package.json"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -17,7 +20,12 @@
     "check": "biome check .",
     "typecheck": "tsc"
   },
-  "keywords": ["jest", "vitest", "test", "utility"],
+  "keywords": [
+    "jest",
+    "vitest",
+    "test",
+    "utility"
+  ],
   "author": "akfm",
   "license": "MIT",
   "devDependencies": {
